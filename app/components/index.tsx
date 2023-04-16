@@ -39,7 +39,7 @@ const Main: FC = () => {
   // get token from url
   const searchParams = useSearchParams()
   const token = searchParams.get('token')
-
+  const [jwtPayload, setJwtPayload] = useState<any>(undefined)
   // check jwt token is valid
   const verifyToken = useCallback(async () => {
     if (token === null || token === '') {
@@ -56,6 +56,7 @@ const Main: FC = () => {
         setAppUnavailable(true)
       } else {
         setAppUnavailable(false)
+        setJwtPayload(data.payload)
       }
     }
   }, [token])
@@ -65,10 +66,10 @@ const Main: FC = () => {
   }, []);
 
   useEffect(() => {
-    if (APP_INFO?.title) {
-      document.title = `${APP_INFO.title}`
+    if (jwtPayload !== undefined && jwtPayload.app_info !== undefined) {
+      document.title = `${jwtPayload.app_info.name}`
     }
-  }, [APP_INFO?.title])
+  }, [jwtPayload])
 
   /*
   * conversation info

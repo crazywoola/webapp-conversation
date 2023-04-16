@@ -16,8 +16,16 @@ export async function POST(request: Request) {
         issuer: 'LangGenius:CE',
         subject: 'LangGenius:CE:Auth',
       }
-    );
-    return NextResponse.json({ payload })
+    ) as any;
+    return NextResponse.json({
+      payload: {
+        ...payload,
+        app_info: {
+          ...payload.app_info,
+          api_key: undefined,
+        },
+      }
+    });
   } catch (err) {
     return NextResponse.json({ err })
   }
