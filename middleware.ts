@@ -5,7 +5,6 @@ import * as jose from 'jose'
 const secret = new TextEncoder().encode(
     'bananaiscool',
 )
-// const allowedContextKeys = ["foo"];
 
 export const middleware = async (request: NextRequest) => {
     const response = NextResponse.next()
@@ -17,7 +16,6 @@ export const middleware = async (request: NextRequest) => {
                 issuer: 'LangGenius:CE',
                 subject: 'LangGenius:CE:Auth',
             })
-            console.log(payload)
             response.cookies.set('access_token', token)
         } else {
             return new Error('No token provided')
