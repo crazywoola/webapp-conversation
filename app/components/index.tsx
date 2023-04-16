@@ -41,6 +41,7 @@ const Main: FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams()
   const ak = searchParams.get('access_token')
+  const token = Cookies.get('access_token')
   // const [jwtPayload, setJwtPayload] = useState<any>(undefined)
   // check jwt token is valid
   // const verifyToken = useCallback(async () => {
@@ -62,10 +63,14 @@ const Main: FC = () => {
   //     }
   //   }
   // }, [token])
+  useEffect(() => {
+    if (ak !== null && ak !== undefined && ak !== '') {
+      router.push('/')
+    }
+  }, [ak]);
 
   const verifyCookie = useCallback(async () => {
-    const token = Cookies.get('access_token')
-    console.log(token)
+
     if (token === null || token === undefined || token === '') {
       setAppUnavailable(true)
     } else {
@@ -76,14 +81,7 @@ const Main: FC = () => {
   useEffect(() => {
     // verifyToken()
     verifyCookie()
-
   }, []);
-
-  useEffect(() => {
-    if (ak !== null && ak !== undefined && ak !== '') {
-      router.push('/')
-    }
-  }, [ak]);
 
   /*
   * conversation info

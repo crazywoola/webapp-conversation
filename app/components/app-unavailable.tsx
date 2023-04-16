@@ -11,7 +11,6 @@ const AppUnavailable: FC<IAppUnavailableProps> = ({
   isUnknwonReason
 }) => {
   const { t } = useTranslation()
-  console.log(AUTHORIZE_URL, CALLBACK_URL)
   return (
     <div className='flex flex-col justify-center items-center h-screen'>
       <div className='flex items-center justify-center w-screen'>
