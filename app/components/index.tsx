@@ -43,22 +43,22 @@ const Main: FC = () => {
 
   // check jwt token is valid
   const verifyToken = useCallback(async () => {
-    // if (token === null || token === '') {
-    //   setAppUnavailable(true)
-    // } else {
-    //   const requestOptions = {
-    //     method: 'POST',
-    //     headers: { 'Content-Type': 'application/json' },
-    //     body: JSON.stringify({ token })
-    //   }
-    //   const response = await fetch('/api/auth', requestOptions)
-    //   const data = await response.json()
-    //   if (data && data.err !== undefined) {
-    //     setAppUnavailable(true)
-    //   } else {
-    //     setAppUnavailable(false)
-    //   }
-    // }
+    if (token === null || token === '') {
+      setAppUnavailable(true)
+    } else {
+      const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token })
+      }
+      const response = await fetch('/api/auth', requestOptions)
+      const data = await response.json()
+      if (data && data.err !== undefined) {
+        setAppUnavailable(true)
+      } else {
+        setAppUnavailable(false)
+      }
+    }
   }, [token])
 
   useEffect(() => {

@@ -1,30 +1,34 @@
 'use client'
-import type { FC } from 'react'
-import React from 'react'
+import React, { FC } from 'react'
+import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
 
-type IAppUnavailableProps = {
+interface IAppUnavailableProps {
   isUnknwonReason: boolean
-  errMessage?: string
 }
 
 const AppUnavailable: FC<IAppUnavailableProps> = ({
-  isUnknwonReason,
-  errMessage,
+  isUnknwonReason
 }) => {
   const { t } = useTranslation()
-  let message = errMessage
-  if (!errMessage) {
-    message = (isUnknwonReason ? t('app.common.appUnkonwError') : t('app.common.appUnavailable')) as string
-  }
 
   return (
-    <div className='flex items-center justify-center w-screen h-screen'>
-      <h1 className='mr-5 h-[50px] leading-[50px] pr-5 text-[24px] font-medium'
-        style={{
-          borderRight: '1px solid rgba(0,0,0,.3)',
-        }}>{(errMessage || isUnknwonReason) ? 500 : 404}</h1>
-      <div className='text-sm'>{message}</div>
+    <div className='flex flex-col justify-center items-center h-screen'>
+      <div className='flex items-center justify-center w-screen'>
+        <h1 className='mr-5 h-[50px] leading-[50px] pr-5 text-[24px] font-medium'
+          style={{
+            borderRight: '1px solid rgba(0,0,0,.3)',
+          }}>401</h1>
+        <div className='text-sm mr-5'>
+
+          <Link href="https://adminchat.pmpmh.com/users/sign_in" className='flex items-center mr-3'>
+            <div className="">{t('app.common.appNeedLogin')}</div>
+          </Link>
+        </div>
+      </div>
+      <div className='flex w-full items-center justify-center mt-5'>
+
+      </div>
     </div>
   )
 }

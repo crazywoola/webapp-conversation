@@ -3,6 +3,7 @@ const translation = {
     welcome: "欢迎使用",
     appUnavailable: "应用不可用",
     appUnkonwError: "应用不可用",
+    appNeedLogin: "应用需要登录",
   },
   chat: {
     newChat: "新对话",
