@@ -4,6 +4,7 @@ const translation = {
     appUnavailable: "应用不可用",
     appUnkonwError: "应用不可用",
     appNeedLogin: "应用需要登录",
+    appMissingAppId: "应用 ID 丢失",
   },
   chat: {
     newChat: "新对话",

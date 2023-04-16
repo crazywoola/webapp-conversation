@@ -2,15 +2,18 @@
 import React, { FC } from 'react'
 import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
+import { useSearchParams } from 'next/navigation'
 import { AUTHORIZE_URL, CALLBACK_URL } from '@/config'
 interface IAppUnavailableProps {
-  isUnknwonReason: boolean
+  missingAppId: boolean
 }
 
 const AppUnavailable: FC<IAppUnavailableProps> = ({
-  isUnknwonReason
+  missingAppId
 }) => {
   const { t } = useTranslation()
+  const searchParams = useSearchParams()
+  const app_id = searchParams.get('app_id')
   return (
     <div className='flex flex-col justify-center items-center h-screen'>
       <div className='flex items-center justify-center w-screen'>
@@ -20,8 +23,8 @@ const AppUnavailable: FC<IAppUnavailableProps> = ({
           }}>401</h1>
         <div className='text-sm mr-5'>
 
-          <Link href={`${AUTHORIZE_URL}?callback_url=${CALLBACK_URL}`} className='flex items-center mr-3 hover:border-b hover:boder-b-1 hover:boder-primary-300'>
-            <div className="">{t('app.common.appNeedLogin')}</div>
+          <Link href={`${AUTHORIZE_URL}?app_id=${app_id}&callback_url=${CALLBACK_URL}`} className='flex items-center mr-3 hover:border-b hover:boder-b-1 hover:boder-primary-300'>
+            <div className="">{missingAppId ? t('app.common.appMissingAppId') : t('app.common.appNeedLogin')}</div>
           </Link>
         </div>
       </div>

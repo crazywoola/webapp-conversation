@@ -31,7 +31,7 @@ const Main: FC = () => {
   * app info
   */
   const [appUnavailable, setAppUnavailable] = useState<boolean>(false)
-  const [isUnknwonReason, setIsUnknwonReason] = useState<boolean>(false)
+  const [missingAppId, setMissingAppId] = useState<boolean>(false)
   const [promptConfig, setPromptConfig] = useState<PromptConfig | null>(null)
   const [inited, setInited] = useState<boolean>(false)
   // in mobile, show sidebar by click button
@@ -41,6 +41,7 @@ const Main: FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams()
   const ak = searchParams.get('access_token')
+  const app_id = searchParams.get('app_id')
   const token = Cookies.get('access_token')
   // const [jwtPayload, setJwtPayload] = useState<any>(undefined)
   // check jwt token is valid
@@ -65,12 +66,16 @@ const Main: FC = () => {
   // }, [token])
   useEffect(() => {
     if (ak !== null && ak !== undefined && ak !== '') {
-      router.push('/')
+      router.push(`/?app_id=${app_id}`)
     }
   }, [ak]);
 
-  const verifyCookie = useCallback(async () => {
-
+  const verifyCookieAndAppId = useCallback(async () => {
+    if (app_id === null || app_id === undefined || app_id === '') {
+      setAppUnavailable(true)
+      setMissingAppId(true)
+      return
+    }
     if (token === null || token === undefined || token === '') {
       setAppUnavailable(true)
     } else {
@@ -80,7 +85,7 @@ const Main: FC = () => {
 
   useEffect(() => {
     // verifyToken()
-    verifyCookie()
+    verifyCookieAndAppId()
   }, []);
 
   /*
@@ -407,7 +412,7 @@ const Main: FC = () => {
   }
 
   if (appUnavailable)
-    return <AppUnavailable isUnknwonReason={isUnknwonReason} />
+    return <AppUnavailable missingAppId={missingAppId} />
 
   if (!APP_ID || !APP_INFO || !promptConfig)
     return <Loading type='app' />

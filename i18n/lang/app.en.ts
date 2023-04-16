@@ -4,6 +4,7 @@ const translation = {
     appUnavailable: "App is unavailable",
     appUnkonwError: "App is unavailable",
     appNeedLogin: "App needs login first",
+    appMissingAppId: "App ID is missing",
   },
   chat: {
     newChat: "New chat",
