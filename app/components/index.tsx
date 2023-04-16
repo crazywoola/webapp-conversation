@@ -1,7 +1,8 @@
 'use client'
 import type { FC } from 'react'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSearchParams } from 'next/navigation'
 import produce from 'immer'
 import { useBoolean, useGetState } from 'ahooks'
 import useConversation from '@/hooks/use-conversation'
@@ -36,9 +37,37 @@ const Main: FC = () => {
   // in mobile, show sidebar by click button
   const [isShowSidebar, { setTrue: showSidebar, setFalse: hideSidebar }] = useBoolean(false)
 
+  // get token from url
+  const searchParams = useSearchParams()
+  const token = searchParams.get('token')
+
+  // check jwt token is valid
+  const verifyToken = useCallback(async () => {
+    // if (token === null || token === '') {
+    //   setAppUnavailable(true)
+    // } else {
+    //   const requestOptions = {
+    //     method: 'POST',
+    //     headers: { 'Content-Type': 'application/json' },
+    //     body: JSON.stringify({ token })
+    //   }
+    //   const response = await fetch('/api/auth', requestOptions)
+    //   const data = await response.json()
+    //   if (data && data.err !== undefined) {
+    //     setAppUnavailable(true)
+    //   } else {
+    //     setAppUnavailable(false)
+    //   }
+    // }
+  }, [token])
+
+  useEffect(() => {
+    verifyToken()
+  }, []);
+
   useEffect(() => {
     if (APP_INFO?.title) {
-      document.title = `${APP_INFO.title} - Powered by LangGenius`
+      document.title = `${APP_INFO.title}`
     }
   }, [APP_INFO?.title])
 
