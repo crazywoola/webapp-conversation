@@ -21,7 +21,7 @@ const AppUnavailable: FC<IAppUnavailableProps> = ({
           }}>401</h1>
         <div className='text-sm mr-5'>
 
-          <Link href="https://adminchat.pmpmh.com/users/sign_in" className='flex items-center mr-3'>
+          <Link href="https://adminchat.pmpmh.com/users/sign_in" className='flex items-center mr-3 hover:border-b hover:boder-b-1 hover:boder-primary-300'>
             <div className="">{t('app.common.appNeedLogin')}</div>
           </Link>
         </div>

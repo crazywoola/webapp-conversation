@@ -8,11 +8,10 @@ export async function POST(request: Request) {
 
   try {
     const token = res.token || ''
-    console.log(token)
     const payload = jwt.verify(
-      token, 
+      token,
       DECODE_KEY,
-      { 
+      {
         algorithms: ['HS256'],
         issuer: 'LangGenius:CE',
         subject: 'LangGenius:CE:Auth',
