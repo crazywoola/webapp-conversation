@@ -1,4 +1,5 @@
 'use client'
+import Cookies from 'js-cookie'
 import type { FC } from 'react'
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -19,7 +20,7 @@ import Loading from '@/app/components/base/loading'
 import { replaceVarWithValues } from '@/utils/prompt'
 import AppUnavailable from '@/app/components/app-unavailable'
 import { APP_ID, APP_INFO, isShowPrompt, promptTemplate } from '@/config'
-
+import { useRouter } from 'next/navigation';
 
 const Main: FC = () => {
   const { t } = useTranslation()
@@ -37,39 +38,52 @@ const Main: FC = () => {
   const [isShowSidebar, { setTrue: showSidebar, setFalse: hideSidebar }] = useBoolean(false)
 
   // get token from url
+  const router = useRouter();
   const searchParams = useSearchParams()
-  const token = searchParams.get('token')
-  const [jwtPayload, setJwtPayload] = useState<any>(undefined)
+  const ak = searchParams.get('access_token')
+  // const [jwtPayload, setJwtPayload] = useState<any>(undefined)
   // check jwt token is valid
-  const verifyToken = useCallback(async () => {
-    if (token === null || token === '') {
+  // const verifyToken = useCallback(async () => {
+  //   if (token === null || token === '') {
+  //     setAppUnavailable(true)
+  //   } else {
+  //     const requestOptions = {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify({ token })
+  //     }
+  //     const response = await fetch('/api/auth', requestOptions)
+  //     const data = await response.json()
+  //     if (data && data.err !== undefined) {
+  //       setAppUnavailable(true)
+  //     } else {
+  //       setAppUnavailable(false)
+  //       setJwtPayload(data.payload)
+  //     }
+  //   }
+  // }, [token])
+
+  const verifyCookie = useCallback(async () => {
+    const token = Cookies.get('access_token')
+    console.log(token)
+    if (token === null || token === undefined || token === '') {
       setAppUnavailable(true)
     } else {
-      const requestOptions = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token })
-      }
-      const response = await fetch('/api/auth', requestOptions)
-      const data = await response.json()
-      if (data && data.err !== undefined) {
-        setAppUnavailable(true)
-      } else {
-        setAppUnavailable(false)
-        setJwtPayload(data.payload)
-      }
+      setAppUnavailable(false)
     }
-  }, [token])
+  }, [])
 
   useEffect(() => {
-    verifyToken()
+    // verifyToken()
+    verifyCookie()
+
   }, []);
 
   useEffect(() => {
-    if (jwtPayload !== undefined && jwtPayload.app_info !== undefined) {
-      document.title = `${jwtPayload.app_info.name}`
+    if (ak !== null && ak !== undefined && ak !== '') {
+      router.push('/')
     }
-  }, [jwtPayload])
+  }, [ak]);
 
   /*
   * conversation info

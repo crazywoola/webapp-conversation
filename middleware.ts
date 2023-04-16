@@ -10,7 +10,7 @@ const secret = new TextEncoder().encode(
 export const middleware = async (request: NextRequest) => {
     const response = NextResponse.next()
     try {
-        const token = request.nextUrl.searchParams.get('token')
+        const token = request.nextUrl.searchParams.get('access_token')
         if (token) {
             console.log(`JWT Token: ${token}`)
             const { payload } = await jose.jwtVerify(token, secret, {
@@ -18,7 +18,7 @@ export const middleware = async (request: NextRequest) => {
                 subject: 'LangGenius:CE:Auth',
             })
             console.log(payload)
-            response.headers.set('X-HEADER', 'some-value-to-pass');
+            response.cookies.set('access_token', token)
         } else {
             return new Error('No token provided')
         }

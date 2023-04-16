@@ -2,7 +2,7 @@
 import React, { FC } from 'react'
 import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
-
+import { AUTHORIZE_URL, CALLBACK_URL } from '@/config'
 interface IAppUnavailableProps {
   isUnknwonReason: boolean
 }
@@ -11,7 +11,7 @@ const AppUnavailable: FC<IAppUnavailableProps> = ({
   isUnknwonReason
 }) => {
   const { t } = useTranslation()
-
+  console.log(AUTHORIZE_URL, CALLBACK_URL)
   return (
     <div className='flex flex-col justify-center items-center h-screen'>
       <div className='flex items-center justify-center w-screen'>
@@ -21,7 +21,7 @@ const AppUnavailable: FC<IAppUnavailableProps> = ({
           }}>401</h1>
         <div className='text-sm mr-5'>
 
-          <Link href="https://adminchat.pmpmh.com/users/sign_in" className='flex items-center mr-3 hover:border-b hover:boder-b-1 hover:boder-primary-300'>
+          <Link href={`${AUTHORIZE_URL}?callback_url=${CALLBACK_URL}`} className='flex items-center mr-3 hover:border-b hover:boder-b-1 hover:boder-primary-300'>
             <div className="">{t('app.common.appNeedLogin')}</div>
           </Link>
         </div>
