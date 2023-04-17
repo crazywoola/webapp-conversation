@@ -6,6 +6,7 @@ const translation = {
     appNeedLogin: '应用需要登录',
     appMissingAppId: '应用 ID 丢失',
     logout: '登出',
+    login: '登录',
   },
   chat: {
     newChat: '新对话',

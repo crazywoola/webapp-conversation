@@ -18,6 +18,7 @@ import Loading from '@/app/components/base/loading'
 import { replaceVarWithValues } from '@/utils/prompt'
 import AppUnavailable from '@/app/components/app-unavailable'
 import { APP_ID, APP_INFO, isShowPrompt, promptTemplate } from '@/config'
+import Cookies from 'js-cookie'
 
 export type IMainProps = {
   env: string
@@ -30,7 +31,7 @@ const Main = ({
   const { t } = useTranslation()
   const media = useBreakpoints()
   const isMobile = media === MediaType.mobile
-
+  const needLogin = t('app.common.appNeedLogin')
   /*
   * app info
   */
@@ -41,38 +42,31 @@ const Main = ({
   // in mobile, show sidebar by click button
   const [isShowSidebar, { setTrue: showSidebar, setFalse: hideSidebar }] = useBoolean(false)
 
-  // get token from url
+  // check app_id and access_token
   const router = useRouter()
   const searchParams = useSearchParams()
   const ak = searchParams.get('access_token')
   const app_id = searchParams.get('app_id')
-
-  useEffect(() => {
-    if (ak !== null && ak !== undefined && ak !== '')
-      router.push(`/?app_id=${app_id}`)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ak])
+  const message = Cookies.get('message')
 
   const verifyCookieAndAppId = useCallback(async () => {
     if (app_id === null || app_id === undefined || app_id === '') {
       setAppUnavailable(true)
-      setErrorMsg('app_id is required')
+      setErrorMsg('message.app.app_id_missing')
       return
     }
-    if (access_token === null || access_token === undefined || access_token === '') {
+    if (message !== undefined && message !== '' && message !== 'message.app.success') {
       setAppUnavailable(true)
-      setErrorMsg(t('app.common.appNeedLogin'))
+      setErrorMsg(message)
+      return
+    }
+    if (access_token === '') {
+      setAppUnavailable(true)
+      setErrorMsg('message.app.need_login')
+      return
     }
 
-    else {
-      setAppUnavailable(false)
-    }
-  }, [app_id, access_token, t])
-
-  useEffect(() => {
-    // verifyToken()
-    verifyCookieAndAppId()
-  }, [verifyCookieAndAppId])
+  }, [app_id, access_token, message])
 
   /*
   * conversation info
@@ -161,7 +155,6 @@ const Main = ({
 
     setControlFocus(Date.now())
   }
-  useEffect(handleConversationSwitch, [currConversationId, inited])
 
   const handleConversationIdChange = (id: string) => {
     if (id === '-1') {
@@ -181,11 +174,7 @@ const Main = ({
   */
   const [chatList, setChatList, getChatList] = useGetState<IChatItem[]>([])
   const chatListDomRef = useRef<HTMLDivElement>(null)
-  useEffect(() => {
-    // scroll to bottom
-    if (chatListDomRef.current)
-      chatListDomRef.current.scrollTop = chatListDomRef.current.scrollHeight
-  }, [chatList, currConversationId])
+
   // user can not edit inputs if user had send message
   const canEditInpus = !chatList.some(item => item.isAnswer === false) && isNewConversation
   const createNewChat = () => {
@@ -223,46 +212,7 @@ const Main = ({
     return []
   }
 
-  // init
-  useEffect(() => {
-    (async () => {
-      try {
-        const [conversationData, appParams] = await Promise.all([fetchConversations(), fetchAppParams()])
 
-        // handle current conversation id
-        const { data: conversations } = conversationData as { data: ConversationItem[] }
-        const _conversationId = getConversationIdFromStorage(APP_ID)
-        const isNotNewConversation = conversations.some(item => item.id === _conversationId)
-
-        // fetch new conversation info
-        const { variables: prompt_variables, introduction }: any = appParams
-
-        setLocaleOnClient(APP_INFO.default_language, true)
-        setNewConversationInfo({
-          name: t('app.chat.newChatDefaultName'),
-          introduction,
-        })
-        setPromptConfig({
-          prompt_template: promptTemplate,
-          prompt_variables,
-        } as PromptConfig)
-
-        setConversationList(conversations as ConversationItem[])
-
-        if (isNotNewConversation)
-          setCurrConversationId(_conversationId, APP_ID, false)
-
-        setInited(true)
-      }
-      catch (e: any) {
-        console.log(e)
-        if (e.status === 404)
-          setAppUnavailable(true)
-        else
-          setAppUnavailable(true)
-      }
-    })()
-  }, [])
 
   const [isResponsing, { setTrue: setResponsingTrue, setFalse: setResponsingFalse }] = useBoolean(false)
   const { notify } = Toast
@@ -393,6 +343,59 @@ const Main = ({
       />
     )
   }
+  // init
+  useEffect(() => {
+    (async () => {
+      try {
+        const [conversationData, appParams] = await Promise.all([fetchConversations(), fetchAppParams()])
+
+        // handle current conversation id
+        const { data: conversations } = conversationData as { data: ConversationItem[] }
+        const _conversationId = getConversationIdFromStorage(APP_ID)
+        const isNotNewConversation = conversations.some(item => item.id === _conversationId)
+
+        // fetch new conversation info
+        const { variables: prompt_variables, introduction }: any = appParams
+
+        setLocaleOnClient(APP_INFO.default_language, true)
+        setNewConversationInfo({
+          name: t('app.chat.newChatDefaultName'),
+          introduction,
+        })
+        setPromptConfig({
+          prompt_template: promptTemplate,
+          prompt_variables,
+        } as PromptConfig)
+
+        setConversationList(conversations as ConversationItem[])
+
+        if (isNotNewConversation)
+          setCurrConversationId(_conversationId, APP_ID, false)
+
+        setInited(true)
+      }
+      catch (e: any) {
+        if (e.status === 404)
+          setAppUnavailable(true)
+        else
+          setAppUnavailable(true)
+      }
+    })()
+  }, [])
+
+  useEffect(() => {
+    // scroll to bottom
+    if (chatListDomRef.current)
+      chatListDomRef.current.scrollTop = chatListDomRef.current.scrollHeight
+  }, [chatList, currConversationId])
+
+  useEffect(handleConversationSwitch, [currConversationId, inited])
+
+  useEffect(() => {
+    if (ak !== null && ak !== undefined && ak !== '')
+      router.push(`/?app_id=${app_id}`)
+    verifyCookieAndAppId()
+  }, [verifyCookieAndAppId, ak])
 
   if (appUnavailable)
     return <AppUnavailable error={errorMsg} env={env} />

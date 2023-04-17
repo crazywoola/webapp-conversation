@@ -6,12 +6,14 @@ export const getAuthByEnv = (env: string) => {
     return {
       AUTHORIZE_URL: 'http://adminchat.pmpmh.com/welcome/authorize',
       CALLBACK_URL: 'http://chat.pmpmh.com/',
+      DASHBOARD_URL: 'http://adminchat.pmpmh.com/dashboard',
     }
   }
   else {
     return {
       AUTHORIZE_URL: 'http://localhost:3000/welcome/authorize',
       CALLBACK_URL: 'http://localhost:3001',
+      DASHBOARD_URL: 'http://localhost:3000/dashboard',
     }
   }
 }

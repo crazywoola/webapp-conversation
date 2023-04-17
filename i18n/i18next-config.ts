@@ -5,6 +5,9 @@ import commonEn from './lang/common.en'
 import commonZh from './lang/common.zh'
 import appEn from './lang/app.en'
 import appZh from './lang/app.zh'
+import messageEn from './lang/message.en'
+import messageZh from './lang/message.zh'
+
 import { Locale } from '.'
 
 const resources = {
@@ -12,12 +15,14 @@ const resources = {
     translation: {
       common: commonEn,
       app: appEn,
+      message: messageEn,
     },
   },
   'zh-Hans': {
     translation: {
       common: commonZh,
       app: appZh,
+      message: messageZh,
     },
   },
 }
@@ -26,7 +31,7 @@ i18n.use(initReactI18next)
   // init i18next
   // for all options read: https://www.i18next.com/overview/configuration-options
   .init({
-    lng: 'en',
+    lng: 'zh-Hans',
     fallbackLng: 'en',
     // debug: true,
     resources,

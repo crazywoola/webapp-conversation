@@ -17,23 +17,30 @@ const AppUnavailable: FC<IAppUnavailableProps> = ({
   const { t } = useTranslation()
   const searchParams = useSearchParams()
   const app_id = searchParams.get('app_id')
-  const { AUTHORIZE_URL, CALLBACK_URL } = getAuthByEnv(env)
+  const { AUTHORIZE_URL, CALLBACK_URL, DASHBOARD_URL } = getAuthByEnv(env)
   return (
     <div className='flex flex-col justify-center items-center h-screen'>
       <div className='flex items-center justify-center w-screen'>
         <h1 className='mr-5 h-[50px] leading-[50px] pr-5 text-[24px] font-medium'
           style={{
             borderRight: '1px solid rgba(0,0,0,.3)',
-          }}>401</h1>
-        <div className='text-sm mr-5'>
-
-          <Link href={`${AUTHORIZE_URL}?app_id=${app_id}&callback_url=${CALLBACK_URL}`} className='flex items-center mr-3 hover:border-b hover:boder-b-1 hover:boder-primary-300'>
-            <div className="">{error || t('app.common.appNeedLogin')}</div>
+          }}>{t(error)}</h1>
+        <div className='inline-flex'>
+          <Link
+            href={`${AUTHORIZE_URL}?app_id=${app_id}&callback_url=${CALLBACK_URL}`}
+            className=' flex items-center justify-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5'
+          >
+            <div className="">{t('app.common.login')}</div>
           </Link>
         </div>
       </div>
-      <div className='flex w-full items-center justify-center mt-5'>
-
+      <div className='flex w-full items-center justify-center mt-5 flex-col gap-2'>
+        <p className='text-base text-gray-700'>{t('message.tip.contact_us')}</p>
+        <p className='text-xs text-gray-500'>
+          <Link href={DASHBOARD_URL}>
+            {t('message.tip.dashboard')}
+          </Link>
+        </p>
       </div>
     </div>
   )

@@ -6,6 +6,7 @@ const translation = {
     appNeedLogin: 'App needs login first',
     appMissingAppId: 'App ID is missing',
     logout: 'Logout',
+    login: 'Login',
   },
   chat: {
     newChat: 'New chat',

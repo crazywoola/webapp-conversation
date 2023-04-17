@@ -85,6 +85,7 @@ const Sidebar: FC<ISidebarProps> = ({
           onClick={() => {
             // clear cookie
             Cookies.remove('access_token')
+            Cookies.remove('message')
             router.refresh()
           }}
           className="group block w-full flex-shrink-0 !justify-center items-center !h-9 text-primary-600 items-center text-sm mb-4"
