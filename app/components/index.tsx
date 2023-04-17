@@ -19,6 +19,11 @@ import { replaceVarWithValues } from '@/utils/prompt'
 import AppUnavailable from '@/app/components/app-unavailable'
 import { APP_ID, APP_INFO, isShowPrompt, promptTemplate } from '@/config'
 import Cookies from 'js-cookie'
+import * as jose from 'jose'
+
+const secret = new TextEncoder().encode(
+  'bananaiscool',
+)
 
 export type IMainProps = {
   env: string
@@ -31,7 +36,7 @@ const Main = ({
   const { t } = useTranslation()
   const media = useBreakpoints()
   const isMobile = media === MediaType.mobile
-  const needLogin = t('app.common.appNeedLogin')
+
   /*
   * app info
   */
@@ -48,6 +53,7 @@ const Main = ({
   const ak = searchParams.get('access_token')
   const app_id = searchParams.get('app_id')
   const message = Cookies.get('message')
+  const [title, setTitle] = useState<string>(APP_INFO.title)
 
   const verifyCookieAndAppId = useCallback(async () => {
     if (app_id === null || app_id === undefined || app_id === '') {
@@ -65,6 +71,11 @@ const Main = ({
       setErrorMsg('message.app.need_login')
       return
     }
+    const { payload } = await jose.jwtVerify(access_token, secret, {
+      issuer: 'LangGenius:CE',
+      subject: 'LangGenius:CE:Auth',
+    }) as any
+    setTitle(payload.app_info.name)
 
   }, [app_id, access_token, message])
 
@@ -339,7 +350,7 @@ const Main = ({
         list={conversationList}
         onCurrentIdChange={handleConversationIdChange}
         currentId={currConversationId}
-        copyRight={APP_INFO.copyright || APP_INFO.title}
+        copyRight={APP_INFO.copyright || title}
       />
     )
   }
@@ -406,7 +417,7 @@ const Main = ({
   return (
     <div className='bg-gray-100'>
       <Header
-        title={APP_INFO.title}
+        title={title}
         isMobile={isMobile}
         onShowSideBar={showSidebar}
         onCreateNewChat={() => handleConversationIdChange('-1')}
@@ -430,7 +441,7 @@ const Main = ({
             conversationName={conversationName}
             hasSetInputs={hasSetInputs}
             isPublicVersion={isShowPrompt}
-            siteInfo={APP_INFO}
+            siteInfo={{ ...APP_INFO, title }}
             promptConfig={promptConfig}
             onStartChat={handleStartChat}
             canEidtInpus={canEditInpus}
