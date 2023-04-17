@@ -3,10 +3,6 @@ import { NextResponse } from 'next/server'
 import { getClientFromApiSk, getInfo, setSession } from '@/app/api/utils/common'
 
 export async function GET(request: NextRequest) {
-  console.log('----------------------------------')
-  console.log(request.headers)
-  console.log(request.cookies)
-  console.log('----------------------------------')
   const { sessionId, user } = getInfo(request)
   const client = await getClientFromApiSk(request)
   if (client) {

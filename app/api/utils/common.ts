@@ -11,15 +11,20 @@ const secret = new TextEncoder().encode(
 
 export const getClientFromApiSk = async (request: NextRequest) => {
   const ak = request.cookies.get('access_token')?.value
-  console.log('document.cookie.ak', ak)
   try {
     if (ak) {
+      console.log('document.cookie.ak if', ak)
       const { payload } = await jose.jwtVerify(ak, secret, {
         issuer: 'LangGenius:CE',
         subject: 'LangGenius:CE:Auth',
       }) as any
+      console.log(payload)
       const sk = payload.app_info.api_key
       return new ChatClient(sk)
+    }
+    else {
+      console.log('document.cookie.ak else', ak)
+      return null
     }
   }
   catch (err) {
