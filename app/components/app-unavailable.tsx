@@ -6,12 +6,12 @@ import { useTranslation } from 'react-i18next'
 import { useSearchParams } from 'next/navigation'
 import { getAuthByEnv } from '@/config'
 type IAppUnavailableProps = {
-  missingAppId: boolean
+  error: string
   env?: string
 }
 
 const AppUnavailable: FC<IAppUnavailableProps> = ({
-  missingAppId,
+  error,
   env = 'development',
 }) => {
   const { t } = useTranslation()
@@ -28,7 +28,7 @@ const AppUnavailable: FC<IAppUnavailableProps> = ({
         <div className='text-sm mr-5'>
 
           <Link href={`${AUTHORIZE_URL}?app_id=${app_id}&callback_url=${CALLBACK_URL}`} className='flex items-center mr-3 hover:border-b hover:boder-b-1 hover:boder-primary-300'>
-            <div className="">{missingAppId ? t('app.common.appMissingAppId') : t('app.common.appNeedLogin')}</div>
+            <div className="">{error || t('app.common.appNeedLogin')}</div>
           </Link>
         </div>
       </div>

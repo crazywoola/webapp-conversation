@@ -1,3 +1,4 @@
+'use client'
 import React from 'react'
 import type { FC } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -6,6 +7,8 @@ import {
   PencilSquareIcon,
 } from '@heroicons/react/24/outline'
 import { ChatBubbleOvalLeftEllipsisIcon as ChatBubbleOvalLeftEllipsisSolidIcon } from '@heroicons/react/24/solid'
+import { useRouter } from 'next/navigation'
+import Cookies from 'js-cookie'
 import Button from '@/app/components/base/button'
 
 import type { ConversationItem } from '@/types/app'
@@ -30,6 +33,8 @@ const Sidebar: FC<ISidebarProps> = ({
   list,
 }) => {
   const { t } = useTranslation()
+  const router = useRouter()
+
   return (
     <div
       className="shrink-0 flex flex-col overflow-y-auto bg-white pc:w-[244px] tablet:w-[192px] mobile:w-[240px]  border-r border-gray-200 tablet:h-[calc(100vh_-_3rem)] mobile:h-screen"
@@ -75,7 +80,17 @@ const Sidebar: FC<ISidebarProps> = ({
         })}
       </nav>
 
-      <div className="flex flex-shrink-0 pr-4 pb-4 pl-4">
+      <div className="flex flex-shrink-0 pr-4 pb-4 pl-4 flex-col">
+        <Button
+          onClick={() => {
+            // clear cookie
+            Cookies.remove('access_token')
+            router.refresh()
+          }}
+          className="group block w-full flex-shrink-0 !justify-center items-center !h-9 text-primary-600 items-center text-sm mb-4"
+        >
+          {t('app.common.logout')}
+        </Button>
         <div className="text-gray-400 font-normal text-xs">© {copyRight} {(new Date()).getFullYear()}</div>
       </div>
     </div>

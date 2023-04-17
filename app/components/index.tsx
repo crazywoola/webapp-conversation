@@ -35,7 +35,7 @@ const Main = ({
   * app info
   */
   const [appUnavailable, setAppUnavailable] = useState<boolean>(false)
-  const [missingAppId, setMissingAppId] = useState<boolean>(false)
+  const [errorMsg, setErrorMsg] = useState<string>('')
   const [promptConfig, setPromptConfig] = useState<PromptConfig | null>(null)
   const [inited, setInited] = useState<boolean>(false)
   // in mobile, show sidebar by click button
@@ -56,15 +56,18 @@ const Main = ({
   const verifyCookieAndAppId = useCallback(async () => {
     if (app_id === null || app_id === undefined || app_id === '') {
       setAppUnavailable(true)
-      setMissingAppId(true)
+      setErrorMsg('app_id is required')
       return
     }
-    if (access_token === null || access_token === undefined || access_token === '')
+    if (access_token === null || access_token === undefined || access_token === '') {
       setAppUnavailable(true)
+      setErrorMsg(t('app.common.appNeedLogin'))
+    }
 
-    else
+    else {
       setAppUnavailable(false)
-  }, [app_id, access_token])
+    }
+  }, [app_id, access_token, t])
 
   useEffect(() => {
     // verifyToken()
@@ -392,7 +395,7 @@ const Main = ({
   }
 
   if (appUnavailable)
-    return <AppUnavailable missingAppId={missingAppId} env={env} />
+    return <AppUnavailable error={errorMsg} env={env} />
 
   if (!APP_ID || !APP_INFO || !promptConfig)
     return <Loading type='app' />
