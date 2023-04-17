@@ -22,7 +22,8 @@ export const getClientFromApiSk = async (request: NextRequest) => {
       return new ChatClient(sk)
     }
   }
-  catch (_) {
+  catch (err) {
+    console.log(err)
     return null
   }
 }
