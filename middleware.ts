@@ -23,6 +23,7 @@ export const middleware = async (request: NextRequest) => {
     else {
       console.log('JWT Token not verified')
     }
+    return response
   }
   catch (_) {
     return response

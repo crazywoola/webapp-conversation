@@ -4,8 +4,8 @@ import { getInfo, setSession } from '@/app/api/utils/common'
 import { APP_INFO } from '@/config'
 
 export async function GET(request: NextRequest) {
-  const { sessionId } = getInfo(request);
+  const { sessionId } = getInfo(request)
   return NextResponse.json(APP_INFO, {
-    headers: setSession(sessionId)
+    headers: setSession(sessionId),
   })
 }

@@ -19,7 +19,6 @@ export const getClientFromApiSk = async (request: NextRequest) => {
         issuer: 'LangGenius:CE',
         subject: 'LangGenius:CE:Auth',
       }) as any
-      console.log(payload)
       const sk = payload.app_info.api_key
       return new ChatClient(sk)
     }
