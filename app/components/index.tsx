@@ -1,5 +1,4 @@
 'use client'
-import Cookies from 'js-cookie'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -22,9 +21,11 @@ import { APP_ID, APP_INFO, isShowPrompt, promptTemplate } from '@/config'
 
 export type IMainProps = {
   env: string
+  access_token: string
 }
 const Main = ({
   env,
+  access_token,
 }: IMainProps) => {
   const { t } = useTranslation()
   const media = useBreakpoints()
@@ -45,31 +46,11 @@ const Main = ({
   const searchParams = useSearchParams()
   const ak = searchParams.get('access_token')
   const app_id = searchParams.get('app_id')
-  const token = Cookies.get('access_token')
-  // const [jwtPayload, setJwtPayload] = useState<any>(undefined)
-  // check jwt token is valid
-  // const verifyToken = useCallback(async () => {
-  //   if (token === null || token === '') {
-  //     setAppUnavailable(true)
-  //   } else {
-  //     const requestOptions = {
-  //       method: 'POST',
-  //       headers: { 'Content-Type': 'application/json' },
-  //       body: JSON.stringify({ token })
-  //     }
-  //     const response = await fetch('/api/auth', requestOptions)
-  //     const data = await response.json()
-  //     if (data && data.err !== undefined) {
-  //       setAppUnavailable(true)
-  //     } else {
-  //       setAppUnavailable(false)
-  //       setJwtPayload(data.payload)
-  //     }
-  //   }
-  // }, [token])
+
   useEffect(() => {
     if (ak !== null && ak !== undefined && ak !== '')
       router.push(`/?app_id=${app_id}`)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ak])
 
   const verifyCookieAndAppId = useCallback(async () => {
@@ -78,17 +59,17 @@ const Main = ({
       setMissingAppId(true)
       return
     }
-    if (token === null || token === undefined || token === '')
+    if (access_token === null || access_token === undefined || access_token === '')
       setAppUnavailable(true)
 
     else
       setAppUnavailable(false)
-  }, [])
+  }, [app_id, access_token])
 
   useEffect(() => {
     // verifyToken()
     verifyCookieAndAppId()
-  }, [])
+  }, [verifyCookieAndAppId])
 
   /*
   * conversation info
