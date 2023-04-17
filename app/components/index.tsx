@@ -1,9 +1,9 @@
 'use client'
 import Cookies from 'js-cookie'
 import type { FC } from 'react'
-import React, { useEffect, useRef, useState, useCallback } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import produce from 'immer'
 import { useBoolean, useGetState } from 'ahooks'
 import useConversation from '@/hooks/use-conversation'
@@ -20,9 +20,10 @@ import Loading from '@/app/components/base/loading'
 import { replaceVarWithValues } from '@/utils/prompt'
 import AppUnavailable from '@/app/components/app-unavailable'
 import { APP_ID, APP_INFO, isShowPrompt, promptTemplate } from '@/config'
-import { useRouter } from 'next/navigation';
 
-const Main: FC = () => {
+const Main: FC = ({
+  env,
+}: any) => {
   const { t } = useTranslation()
   const media = useBreakpoints()
   const isMobile = media === MediaType.mobile
@@ -38,7 +39,7 @@ const Main: FC = () => {
   const [isShowSidebar, { setTrue: showSidebar, setFalse: hideSidebar }] = useBoolean(false)
 
   // get token from url
-  const router = useRouter();
+  const router = useRouter()
   const searchParams = useSearchParams()
   const ak = searchParams.get('access_token')
   const app_id = searchParams.get('app_id')
@@ -65,10 +66,9 @@ const Main: FC = () => {
   //   }
   // }, [token])
   useEffect(() => {
-    if (ak !== null && ak !== undefined && ak !== '') {
+    if (ak !== null && ak !== undefined && ak !== '')
       router.push(`/?app_id=${app_id}`)
-    }
-  }, [ak]);
+  }, [ak])
 
   const verifyCookieAndAppId = useCallback(async () => {
     if (app_id === null || app_id === undefined || app_id === '') {
@@ -76,17 +76,17 @@ const Main: FC = () => {
       setMissingAppId(true)
       return
     }
-    if (token === null || token === undefined || token === '') {
+    if (token === null || token === undefined || token === '')
       setAppUnavailable(true)
-    } else {
+
+    else
       setAppUnavailable(false)
-    }
   }, [])
 
   useEffect(() => {
     // verifyToken()
     verifyCookieAndAppId()
-  }, []);
+  }, [])
 
   /*
   * conversation info
@@ -239,7 +239,6 @@ const Main: FC = () => {
 
   // init
   useEffect(() => {
-
     (async () => {
       try {
         const [conversationData, appParams] = await Promise.all([fetchConversations(), fetchAppParams()])
@@ -270,13 +269,10 @@ const Main: FC = () => {
         setInited(true)
       }
       catch (e: any) {
-        if (e.status === 404) {
+        if (e.status === 404)
           setAppUnavailable(true)
-        }
-        else {
-          setIsUnknwonReason(true)
+        else
           setAppUnavailable(true)
-        }
       }
     })()
   }, [])
@@ -361,9 +357,9 @@ const Main: FC = () => {
       },
       async onCompleted() {
         setResponsingFalse()
-        if (!tempNewConversationId) {
+        if (!tempNewConversationId)
           return
-        }
+
         if (getConversationIdChangeBecauseOfNew()) {
           const { data: conversations }: any = await fetchConversations()
           setConversationList(conversations as ConversationItem[])
@@ -412,7 +408,7 @@ const Main: FC = () => {
   }
 
   if (appUnavailable)
-    return <AppUnavailable missingAppId={missingAppId} />
+    return <AppUnavailable missingAppId={missingAppId} env={env} />
 
   if (!APP_ID || !APP_INFO || !promptConfig)
     return <Loading type='app' />

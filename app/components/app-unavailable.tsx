@@ -1,19 +1,23 @@
 'use client'
-import React, { FC } from 'react'
+import type { FC } from 'react'
+import React from 'react'
 import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
 import { useSearchParams } from 'next/navigation'
-import { AUTHORIZE_URL, CALLBACK_URL } from '@/config'
-interface IAppUnavailableProps {
+import { getAuthByEnv } from '@/config'
+type IAppUnavailableProps = {
   missingAppId: boolean
+  env?: string
 }
 
 const AppUnavailable: FC<IAppUnavailableProps> = ({
-  missingAppId
+  missingAppId,
+  env = 'development',
 }) => {
   const { t } = useTranslation()
   const searchParams = useSearchParams()
   const app_id = searchParams.get('app_id')
+  const { AUTHORIZE_URL, CALLBACK_URL } = getAuthByEnv(env)
   return (
     <div className='flex flex-col justify-center items-center h-screen'>
       <div className='flex items-center justify-center w-screen'>
