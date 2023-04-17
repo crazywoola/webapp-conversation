@@ -252,6 +252,7 @@ const Main = ({
         setInited(true)
       }
       catch (e: any) {
+        console.log(e)
         if (e.status === 404)
           setAppUnavailable(true)
         else
