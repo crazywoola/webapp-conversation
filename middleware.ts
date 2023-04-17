@@ -22,7 +22,6 @@ export const middleware = async (request: NextRequest) => {
     }
     else {
       console.log('JWT Token not verified')
-      return new Error('No token provided')
     }
   }
   catch (_) {
