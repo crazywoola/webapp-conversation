@@ -1,6 +1,5 @@
 'use client'
 import Cookies from 'js-cookie'
-import type { FC } from 'react'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -21,9 +20,12 @@ import { replaceVarWithValues } from '@/utils/prompt'
 import AppUnavailable from '@/app/components/app-unavailable'
 import { APP_ID, APP_INFO, isShowPrompt, promptTemplate } from '@/config'
 
-const Main: FC = ({
+export type IMainProps = {
+  env: string
+}
+const Main = ({
   env,
-}: any) => {
+}: IMainProps) => {
   const { t } = useTranslation()
   const media = useBreakpoints()
   const isMobile = media === MediaType.mobile
