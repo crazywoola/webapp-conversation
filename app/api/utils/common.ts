@@ -11,7 +11,7 @@ const secret = new TextEncoder().encode(
 
 export const getClientFromApiSk = async (request: NextRequest) => {
   const ak = request.cookies.get('access_token')?.value
-
+  console.log('document.cookie.ak', ak)
   try {
     if (ak) {
       const { payload } = await jose.jwtVerify(ak, secret, {
