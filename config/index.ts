@@ -1,6 +1,13 @@
 import { AppInfo } from "@/types/app"
-export const APP_ID = ''
-export const API_KEY = ''
+export const APP_ID = 'banana'
+// export const API_KEY = 'sk-RTU0lS9jYi9Rnvi73iIzKS8gK8AVfJLF'
+export const AUTHORIZE_URL = 'http://localhost:3000/welcome/authorize'
+export const CALLBACK_URL = 'http://localhost:3001'
+
+// export const AUTHORIZE_URL = 'http://adminchat.pmpmh.com/welcome/authorize'
+// export const CALLBACK_URL = 'http://chat.pmpmh.com/'
+
+export const API_KEY = 'sk-iAnTDfwuYA0U3T2lvEK3Sn1rm5NYwsNn'
 
 export const APP_INFO: AppInfo = {
   "title": 'Chat APP',

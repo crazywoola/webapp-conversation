@@ -1,11 +1,17 @@
 import { type NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
-import { getInfo, setSession, client } from '@/app/api/utils/common'
+import { getInfo, getClientFromApiSk, setSession } from '@/app/api/utils/common'
 
 export async function GET(request: NextRequest) {
   const { sessionId, user } = getInfo(request);
-  const { data } = await client.getApplicationParameters(user);
-  return NextResponse.json(data as object, {
-    headers: setSession(sessionId)
+  const client = await getClientFromApiSk(request)
+  if (client) {
+    const { data } = await client.getApplicationParameters(user) as any;
+    return NextResponse.json(data, {
+      headers: setSession(sessionId)
+    })
+  }
+  return NextResponse.json({
+    error: 'No client'
   })
 }

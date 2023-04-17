@@ -1,7 +1,9 @@
 'use client'
+import Cookies from 'js-cookie'
 import type { FC } from 'react'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSearchParams } from 'next/navigation'
 import produce from 'immer'
 import { useBoolean, useGetState } from 'ahooks'
 import useConversation from '@/hooks/use-conversation'
@@ -10,37 +12,81 @@ import Sidebar from '@/app/components/sidebar'
 import ConfigSence from '@/app/components/config-scence'
 import Header from '@/app/components/header'
 import { fetchAppParams, fetchChatList, fetchConversations, sendChatMessage, updateFeedback } from '@/service'
-import type { ConversationItem, Feedbacktype, IChatItem, PromptConfig, AppInfo } from '@/types/app'
+import type { ConversationItem, Feedbacktype, IChatItem, PromptConfig } from '@/types/app'
 import Chat from '@/app/components/chat'
 import { setLocaleOnClient } from '@/i18n/client'
 import useBreakpoints, { MediaType } from '@/hooks/use-breakpoints'
 import Loading from '@/app/components/base/loading'
 import { replaceVarWithValues } from '@/utils/prompt'
 import AppUnavailable from '@/app/components/app-unavailable'
-import { APP_ID, API_KEY, APP_INFO, isShowPrompt, promptTemplate } from '@/config'
-
+import { APP_ID, APP_INFO, isShowPrompt, promptTemplate } from '@/config'
+import { useRouter } from 'next/navigation';
 
 const Main: FC = () => {
   const { t } = useTranslation()
   const media = useBreakpoints()
   const isMobile = media === MediaType.mobile
-  const hasSetAppConfig = APP_ID && API_KEY
 
   /*
   * app info
   */
   const [appUnavailable, setAppUnavailable] = useState<boolean>(false)
-  const [isUnknwonReason, setIsUnknwonReason] = useState<boolean>(false)
+  const [missingAppId, setMissingAppId] = useState<boolean>(false)
   const [promptConfig, setPromptConfig] = useState<PromptConfig | null>(null)
   const [inited, setInited] = useState<boolean>(false)
   // in mobile, show sidebar by click button
   const [isShowSidebar, { setTrue: showSidebar, setFalse: hideSidebar }] = useBoolean(false)
 
+  // get token from url
+  const router = useRouter();
+  const searchParams = useSearchParams()
+  const ak = searchParams.get('access_token')
+  const app_id = searchParams.get('app_id')
+  const token = Cookies.get('access_token')
+  // const [jwtPayload, setJwtPayload] = useState<any>(undefined)
+  // check jwt token is valid
+  // const verifyToken = useCallback(async () => {
+  //   if (token === null || token === '') {
+  //     setAppUnavailable(true)
+  //   } else {
+  //     const requestOptions = {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify({ token })
+  //     }
+  //     const response = await fetch('/api/auth', requestOptions)
+  //     const data = await response.json()
+  //     if (data && data.err !== undefined) {
+  //       setAppUnavailable(true)
+  //     } else {
+  //       setAppUnavailable(false)
+  //       setJwtPayload(data.payload)
+  //     }
+  //   }
+  // }, [token])
   useEffect(() => {
-    if (APP_INFO?.title) {
-      document.title = `${APP_INFO.title} - Powered by LangGenius`
+    if (ak !== null && ak !== undefined && ak !== '') {
+      router.push(`/?app_id=${app_id}`)
     }
-  }, [APP_INFO?.title])
+  }, [ak]);
+
+  const verifyCookieAndAppId = useCallback(async () => {
+    if (app_id === null || app_id === undefined || app_id === '') {
+      setAppUnavailable(true)
+      setMissingAppId(true)
+      return
+    }
+    if (token === null || token === undefined || token === '') {
+      setAppUnavailable(true)
+    } else {
+      setAppUnavailable(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    // verifyToken()
+    verifyCookieAndAppId()
+  }, []);
 
   /*
   * conversation info
@@ -193,10 +239,7 @@ const Main: FC = () => {
 
   // init
   useEffect(() => {
-    if (!hasSetAppConfig) {
-      setAppUnavailable(true)
-      return
-    }
+
     (async () => {
       try {
         const [conversationData, appParams] = await Promise.all([fetchConversations(), fetchAppParams()])
@@ -369,7 +412,7 @@ const Main: FC = () => {
   }
 
   if (appUnavailable)
-    return <AppUnavailable isUnknwonReason={isUnknwonReason} errMessage={!hasSetAppConfig ? 'Please set APP_ID and API_KEY in config/index.tsx' : ''} />
+    return <AppUnavailable missingAppId={missingAppId} />
 
   if (!APP_ID || !APP_INFO || !promptConfig)
     return <Loading type='app' />
