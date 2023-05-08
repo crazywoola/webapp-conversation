@@ -1,5 +1,5 @@
 {
-  "name": "langgenius-gateway-app",
+  "name": "webapp-conversation",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -34,6 +34,7 @@
     "jose": "^4.14.0",
     "js-cookie": "^3.0.1",
     "jsonwebtoken": "^9.0.0",
+    "langgenius-client": "^1.0.0",
     "negotiator": "^0.6.3",
     "next": "13.2.4",
     "react": "18.2.0",

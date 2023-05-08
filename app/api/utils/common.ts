@@ -1,9 +1,10 @@
 import { type NextRequest } from 'next/server'
 import * as jose from 'jose'
-import * as uuid from 'uuid'
-import { ChatClient } from '../sdk'
 import { APP_ID } from '@/config'
 const userPrefix = `user_${APP_ID}:`
+import { ChatClient } from 'langgenius-client'
+import { v4 } from 'uuid'
+
 
 const secret = new TextEncoder().encode(
   'bananaiscool',
@@ -33,8 +34,8 @@ export const getClientFromApiSk = async (request: NextRequest) => {
   }
 }
 export const getInfo = (request: NextRequest) => {
-  const sessionId = request.cookies.get('session_id')?.value || uuid.v4()
-  const user = userPrefix + sessionId
+  const sessionId = request.cookies.get('session_id')?.value || v4();
+  const user = userPrefix + sessionId;
   return {
     sessionId,
     user,
