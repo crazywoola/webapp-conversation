@@ -87,35 +87,33 @@ const Welcome: FC<IWelcomeProps> = ({
       </div>
     )
   }
-
   const renderInputs = () => {
     return (
       <div className='space-y-3'>
-        {promptConfig.prompt_variables.map(item => (
-          <div className='tablet:flex tablet:!h-9 mobile:space-y-2 tablet:space-y-0 mobile:text-xs tablet:text-sm' key={item.key}>
+        {promptConfig.prompt_variables.map((item) => {
+          console.log(item)
+          return <div className='tablet:flex tablet:!h-9 mobile:space-y-2 tablet:space-y-0 mobile:text-xs tablet:text-sm' key={item.key}>
             <label className={`flex-shrink-0 flex items-center mobile:text-gray-700 tablet:text-gray-900 mobile:font-medium pc:font-normal ${s.formLabel}`}>{item.name}</label>
-            {item.type === 'select'
-              ? (
-                <Select
-                  className='w-full'
-                  defaultValue={inputs?.[item.key]}
-                  onSelect={(i) => { setInputs({ ...inputs, [item.key]: i.value }) }}
-                  items={(item.options || []).map(i => ({ name: i, value: i }))}
-                  allowSearch={false}
-                  bgClassName='bg-gray-50'
-                />
-              )
-              : (
-                <input
-                  placeholder={item.name}
-                  value={inputs?.[item.key] || ''}
-                  onChange={(e) => { setInputs({ ...inputs, [item.key]: e.target.value }) }}
-                  className={'w-full flex-grow py-2 pl-3 pr-3 box-border rounded-lg bg-gray-50'}
-                  maxLength={item.max_length || DEFAULT_VALUE_MAX_LEN}
-                />
-              )}
+            {item.type === 'select' ? (
+              <Select
+                className='w-full'
+                defaultValue={inputs?.[item.key]}
+                onSelect={(i) => { setInputs({ ...inputs, [item.key]: i.value }) }}
+                items={[]}
+                allowSearch={false}
+                bgClassName='bg-gray-50'
+              />
+            ) : (
+              <input
+                placeholder={`${item.name}${!item.required ? `(${t('app.chat.optional')})` : ''}`}
+                value={inputs?.[item.key] || ''}
+                onChange={(e) => { setInputs({ ...inputs, [item.key]: e.target.value }) }}
+                className={`w-full flex-grow py-2 pl-3 pr-3 box-border rounded-lg bg-gray-50`}
+                maxLength={item.max_length || DEFAULT_VALUE_MAX_LEN}
+              />
+            )}
           </div>
-        ))}
+        })}
       </div>
     )
   }

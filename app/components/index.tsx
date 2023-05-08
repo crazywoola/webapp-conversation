@@ -366,7 +366,7 @@ const Main = ({
         const isNotNewConversation = conversations.some(item => item.id === _conversationId)
 
         // fetch new conversation info
-        const { variables: prompt_variables, introduction }: any = appParams
+        const { user_input_form, introduction }: any = appParams
 
         setLocaleOnClient(APP_INFO.default_language, true)
         setNewConversationInfo({
@@ -375,7 +375,15 @@ const Main = ({
         })
         setPromptConfig({
           prompt_template: promptTemplate,
-          prompt_variables,
+          prompt_variables: user_input_form.map((i: any) => {
+            return {
+              ...i['text-input'],
+              key: i['text-input'].label,
+              label: i['text-input'].label,
+              name: i['text-input'].label,
+              type: 'text',
+            }
+          }),
         } as PromptConfig)
 
         setConversationList(conversations as ConversationItem[])

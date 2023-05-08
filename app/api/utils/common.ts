@@ -21,7 +21,7 @@ export const getClientFromApiSk = async (request: NextRequest) => {
         subject: 'LangGenius:CE:Auth',
       }) as any
       const sk = payload.app_info.api_key
-      return new ChatClient(sk)
+      return new ChatClient(sk, 'https://api.dify.ai/v1')
     }
     else {
       console.log('document.cookie.ak else', ak)

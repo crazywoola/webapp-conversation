@@ -4,9 +4,10 @@ export type PromptVariable = {
   key: string,
   name: string,
   type: "string" | "number" | "select",
-  default?: string | number,
-  options?: string[]
   max_length: number
+  label: string
+  required: boolean
+  variable: string
 }
 
 export type PromptConfig = {
