@@ -62,6 +62,7 @@ const handleStream = (response: any, onData: IOnData, onCompleted?: IOnCompleted
       const lines = buffer.split('\n')
       try {
         lines.forEach((message) => {
+          console.log(message)
           if (!message)
             return
           bufferObj = JSON.parse(message.substring(6)) // remove data: and parse as json
