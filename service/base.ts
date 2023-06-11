@@ -27,7 +27,7 @@ export type IOnDataMoreInfo = {
 }
 
 export type IOnData = (message: string, isFirstMessage: boolean, moreInfo: IOnDataMoreInfo) => void
-export type IOnCompleted = () => void
+export type IOnCompleted = (hasError?: boolean) => void
 export type IOnError = (msg: string) => void
 
 type IOtherOptions = {
@@ -51,43 +51,64 @@ const handleStream = (response: any, onData: IOnData, onCompleted?: IOnCompleted
   let buffer = ''
   let bufferObj: any
   let isFirstMessage = true
-
   function read() {
-    const result = reader.read()
-    if (result.done) {
-      onCompleted && onCompleted()
-      return
-    }
-
-    buffer += decoder.decode(result.value, { stream: true })
-    const lines = buffer.split('\n')
-    try {
-      for (const message of lines) {
-        if (!message) {
-          continue
-        }
-
-        bufferObj = JSON.parse(message.substring(6)) // remove data: and parse as json
-        onData(unicodeToChar(bufferObj.answer), isFirstMessage, {
-          conversationId: bufferObj.conversation_id,
-          messageId: bufferObj.id,
-        })
-        isFirstMessage = false
+    let hasError = false
+    reader.read().then((result: any) => {
+      if (result.done) {
+        onCompleted && onCompleted()
+        return
       }
-
-      buffer = lines[lines.length - 1]
-    } catch (e) {
-      onData('', false, {
-        conversationId: undefined,
-        messageId: '',
-        errorMessage: `${e}`,
-      })
-      return
-    }
-
-    read()
+      buffer += decoder.decode(result.value, { stream: true })
+      const lines = buffer.split('\n')
+      try {
+        lines.forEach((message) => {
+          if (message.startsWith('data: ')) { // check if it starts with data:
+            // console.log(message);
+            try {
+              bufferObj = JSON.parse(message.substring(6)) // remove data: and parse as json
+            }
+            catch (e) {
+              // mute handle message cut off
+              onData('', isFirstMessage, {
+                conversationId: bufferObj?.conversation_id,
+                messageId: bufferObj?.id,
+              })
+              return
+            }
+            if (bufferObj.status === 400 || !bufferObj.event) {
+              onData('', false, {
+                conversationId: undefined,
+                messageId: '',
+                errorMessage: bufferObj.message,
+              })
+              hasError = true
+              onCompleted && onCompleted(true)
+              return
+            }
+            // can not use format here. Because message is splited.
+            onData(unicodeToChar(bufferObj.answer), isFirstMessage, {
+              conversationId: bufferObj.conversation_id,
+              messageId: bufferObj.id,
+            })
+            isFirstMessage = false
+          }
+        })
+        buffer = lines[lines.length - 1]
+      }
+      catch (e) {
+        onData('', false, {
+          conversationId: undefined,
+          messageId: '',
+          errorMessage: `${e}`,
+        })
+        hasError = true
+        onCompleted && onCompleted(true)
+        return
+      }
+      if (!hasError)
+        read()
+    })
   }
-
   read()
 }
 
