@@ -359,8 +359,6 @@ const Main = ({
     (async () => {
       try {
         const [conversationData, appParams] = await Promise.all([fetchConversations(), fetchAppParams()])
-        console.log(appParams)
-        console.log(conversationData)
         // handle current conversation id
         const { data: conversations } = conversationData as { data: ConversationItem[] }
 
