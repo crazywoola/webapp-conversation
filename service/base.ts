@@ -42,7 +42,6 @@ function unicodeToChar(text: string) {
     return String.fromCharCode(parseInt(p1, 16))
   })
 }
-
 const handleStream = (response: any, onData: IOnData, onCompleted?: IOnCompleted) => {
   if (!response.ok)
     throw new Error('Network response was not ok')
@@ -52,43 +51,46 @@ const handleStream = (response: any, onData: IOnData, onCompleted?: IOnCompleted
   let buffer = ''
   let bufferObj: any
   let isFirstMessage = true
+
   function read() {
-    reader.read().then((result: any) => {
-      console.log(result)
-      if (result.done) {
-        onCompleted && onCompleted()
-        return
-      }
-      buffer += decoder.decode(result.value, { stream: true })
-      const lines = buffer.split('\n')
-      try {
-        lines.forEach((message) => {
-          console.log(message)
-          if (!message)
-            return
-          bufferObj = JSON.parse(message.substring(6)) // remove data: and parse as json
-          onData(unicodeToChar(bufferObj.answer), isFirstMessage, {
-            conversationId: bufferObj.conversation_id,
-            messageId: bufferObj.id,
-          })
-          isFirstMessage = false
+    const result = reader.read()
+    if (result.done) {
+      onCompleted && onCompleted()
+      return
+    }
+
+    buffer += decoder.decode(result.value, { stream: true })
+    const lines = buffer.split('\n')
+    try {
+      for (const message of lines) {
+        if (!message) {
+          continue
+        }
+
+        bufferObj = JSON.parse(message.substring(6)) // remove data: and parse as json
+        onData(unicodeToChar(bufferObj.answer), isFirstMessage, {
+          conversationId: bufferObj.conversation_id,
+          messageId: bufferObj.id,
         })
-        buffer = lines[lines.length - 1]
-      }
-      catch (e) {
-        onData('', false, {
-          conversationId: undefined,
-          messageId: '',
-          errorMessage: `${e}`,
-        })
-        return
+        isFirstMessage = false
       }
 
-      read()
-    })
+      buffer = lines[lines.length - 1]
+    } catch (e) {
+      onData('', false, {
+        conversationId: undefined,
+        messageId: '',
+        errorMessage: `${e}`,
+      })
+      return
+    }
+
+    read()
   }
+
   read()
 }
+
 
 const baseFetch = (url: string, fetchOptions: any, { needAllResponseContent }: IOtherOptions) => {
   const options = Object.assign({}, baseOptions, fetchOptions)
