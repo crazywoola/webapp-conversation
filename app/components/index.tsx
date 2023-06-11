@@ -15,7 +15,7 @@ import Chat from '@/app/components/chat'
 import { setLocaleOnClient } from '@/i18n/client'
 import useBreakpoints, { MediaType } from '@/hooks/use-breakpoints'
 import Loading from '@/app/components/base/loading'
-import { replaceVarWithValues } from '@/utils/prompt'
+import { replaceVarWithValues, userInputsFormToPromptVariables } from '@/utils/prompt'
 import AppUnavailable from '@/app/components/app-unavailable'
 import { APP_ID, APP_INFO, isShowPrompt, promptTemplate } from '@/config'
 import Cookies from 'js-cookie'
@@ -359,9 +359,11 @@ const Main = ({
     (async () => {
       try {
         const [conversationData, appParams] = await Promise.all([fetchConversations(), fetchAppParams()])
-
+        console.log(appParams)
+        console.log(conversationData)
         // handle current conversation id
         const { data: conversations } = conversationData as { data: ConversationItem[] }
+
         const _conversationId = getConversationIdFromStorage(APP_ID)
         const isNotNewConversation = conversations.some(item => item.id === _conversationId)
 
@@ -373,17 +375,10 @@ const Main = ({
           name: t('app.chat.newChatDefaultName'),
           introduction,
         })
+        const prompt_variables = userInputsFormToPromptVariables(user_input_form)
         setPromptConfig({
           prompt_template: promptTemplate,
-          prompt_variables: user_input_form.map((i: any) => {
-            return {
-              ...i['text-input'],
-              key: i['text-input'].label,
-              label: i['text-input'].label,
-              name: i['text-input'].label,
-              type: 'text',
-            }
-          }),
+          prompt_variables,
         } as PromptConfig)
 
         setConversationList(conversations as ConversationItem[])

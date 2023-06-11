@@ -99,7 +99,7 @@ const Welcome: FC<IWelcomeProps> = ({
                 className='w-full'
                 defaultValue={inputs?.[item.key]}
                 onSelect={(i) => { setInputs({ ...inputs, [item.key]: i.value }) }}
-                items={[]}
+                items={(item.options || []).map(i => ({ name: i, value: i }))}
                 allowSearch={false}
                 bgClassName='bg-gray-50'
               />

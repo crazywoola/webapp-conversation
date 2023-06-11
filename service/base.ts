@@ -123,9 +123,9 @@ const baseFetch = (url: string, fetchOptions: any, { needAllResponseContent }: I
       globalThis.fetch(urlWithPrefix, options)
         .then((res: any) => {
           const resClone = res.clone()
+
           // Error handler
-          if (!/^(2|3)\d{2}$/.test(res.status)) {
-            const bodyJson = res.json()
+          if (res.status !== 200 && res.status !== 201 && res.status !== 204) {
             switch (res.status) {
               case 401: {
                 Toast.notify({ type: 'error', message: 'Invalid token' })
@@ -135,9 +135,7 @@ const baseFetch = (url: string, fetchOptions: any, { needAllResponseContent }: I
               default:
                 // eslint-disable-next-line no-new
                 new Promise(() => {
-                  bodyJson.then((data: any) => {
-                    Toast.notify({ type: 'error', message: data.message })
-                  })
+                  Toast.notify({ type: 'error', message: 'Server errors' })
                 })
             }
             return Promise.reject(resClone)
