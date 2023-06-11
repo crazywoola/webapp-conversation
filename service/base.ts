@@ -62,10 +62,12 @@ const handleStream = (response: any, onData: IOnData, onCompleted?: IOnCompleted
       const lines = buffer.split('\n')
       try {
         lines.forEach((message) => {
+          console.log(message)
           if (message.startsWith('data: ')) { // check if it starts with data:
             // console.log(message);
             try {
               bufferObj = JSON.parse(message.substring(6)) // remove data: and parse as json
+              console.log(bufferObj)
             }
             catch (e) {
               // mute handle message cut off
@@ -96,6 +98,7 @@ const handleStream = (response: any, onData: IOnData, onCompleted?: IOnCompleted
         buffer = lines[lines.length - 1]
       }
       catch (e) {
+        console.log(e)
         onData('', false, {
           conversationId: undefined,
           messageId: '',
