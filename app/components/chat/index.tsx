@@ -1,10 +1,11 @@
 'use client'
 import type { FC } from 'react'
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import cn from 'classnames'
 import { HandThumbDownIcon, HandThumbUpIcon } from '@heroicons/react/24/outline'
 import { useTranslation } from 'react-i18next'
 import s from './style.module.css'
+import LoadingAnim from './loading-anim'
 import { randomString } from '@/utils/string'
 import type { Feedbacktype, MessageRating } from '@/types/app'
 import Tooltip from '@/app/components/base/tooltip'
@@ -166,7 +167,13 @@ const Answer: FC<IAnswerProps> = ({ item, feedbackDisabled = false, onFeedback, 
   return (
     <div key={id}>
       <div className='flex items-start'>
-        <div className={`${s.answerIcon} ${isResponsing ? s.typeingIcon : ''} w-10 h-10 shrink-0`}></div>
+        <div className={`${s.answerIcon} w-10 h-10 shrink-0`}>
+          {isResponsing
+            && <div className={s.typeingIcon}>
+              <LoadingAnim type='avatar' />
+            </div>
+          }
+        </div>
         <div className={`${s.answerWrap}`}>
           <div className={`${s.answer} relative text-sm text-gray-900`}>
             <div className={'ml-2 py-3 px-4 bg-gray-100 rounded-tr-2xl rounded-b-2xl'}>
@@ -176,7 +183,15 @@ const Answer: FC<IAnswerProps> = ({ item, feedbackDisabled = false, onFeedback, 
                   <div className='text-xs text-gray-500'>{t('app.chat.openingStatementTitle')}</div>
                 </div>
               )}
-              <Markdown content={content} />
+              {(isResponsing && !content)
+                ? (
+                  <div className='flex items-center justify-center w-6 h-5'>
+                    <LoadingAnim type='text' />
+                  </div>
+                )
+                : (
+                  <Markdown content={content} />
+                )}
             </div>
             <div className='absolute top-[-14px] right-[-14px] flex flex-row justify-end gap-1'>
               {!feedbackDisabled && !item.feedbackDisabled && renderItemOperation()}
@@ -232,6 +247,7 @@ const Chat: FC<IChatProps> = ({
 }) => {
   const { t } = useTranslation()
   const { notify } = Toast
+  const isUseInputMethod = useRef(false)
 
   const [query, setQuery] = React.useState('')
   const handleContentChange = (e: any) => {
@@ -267,12 +283,14 @@ const Chat: FC<IChatProps> = ({
   const handleKeyUp = (e: any) => {
     if (e.code === 'Enter') {
       e.preventDefault()
-      if (!e.shiftKey)
+      // prevent send message when using input method enter
+      if (!e.shiftKey && !isUseInputMethod.current)
         handleSend()
     }
   }
 
   const haneleKeyDown = (e: any) => {
+    isUseInputMethod.current = e.nativeEvent.isComposing
     if (e.code === 'Enter' && !e.shiftKey) {
       setQuery(query.replace(/\n$/, ''))
       e.preventDefault()

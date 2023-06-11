@@ -62,8 +62,9 @@ const handleStream = (response: any, onData: IOnData, onCompleted?: IOnCompleted
       const lines = buffer.split('\n')
       try {
         lines.forEach((message) => {
-          if (!message) return
-          bufferObj = JSON.parse(message) // remove data: and parse as json
+          if (!message)
+            return
+          bufferObj = JSON.parse(message.substring(6)) // remove data: and parse as json
           onData(unicodeToChar(bufferObj.answer), isFirstMessage, {
             conversationId: bufferObj.conversation_id,
             messageId: bufferObj.id,
@@ -71,11 +72,12 @@ const handleStream = (response: any, onData: IOnData, onCompleted?: IOnCompleted
           isFirstMessage = false
         })
         buffer = lines[lines.length - 1]
-      } catch (e) {
+      }
+      catch (e) {
         onData('', false, {
           conversationId: undefined,
           messageId: '',
-          errorMessage: e + ''
+          errorMessage: `${e}`,
         })
         return
       }
@@ -89,7 +91,7 @@ const handleStream = (response: any, onData: IOnData, onCompleted?: IOnCompleted
 const baseFetch = (url: string, fetchOptions: any, { needAllResponseContent }: IOtherOptions) => {
   const options = Object.assign({}, baseOptions, fetchOptions)
 
-  let urlPrefix = API_PREFIX
+  const urlPrefix = API_PREFIX
 
   let urlWithPrefix = `${urlPrefix}${url.startsWith('/') ? url : `/${url}`}`
 
@@ -123,27 +125,34 @@ const baseFetch = (url: string, fetchOptions: any, { needAllResponseContent }: I
       globalThis.fetch(urlWithPrefix, options)
         .then((res: any) => {
           const resClone = res.clone()
-
           // Error handler
-          if (res.status !== 200 && res.status !== 201 && res.status !== 204) {
-            switch (res.status) {
-              case 401: {
-                Toast.notify({ type: 'error', message: 'Invalid token' })
-                return
-
+          if (!/^(2|3)\d{2}$/.test(res.status)) {
+            try {
+              const bodyJson = res.json()
+              switch (res.status) {
+                case 401: {
+                  Toast.notify({ type: 'error', message: 'Invalid token' })
+                  return
+                }
+                default:
+                  // eslint-disable-next-line no-new
+                  new Promise(() => {
+                    bodyJson.then((data: any) => {
+                      Toast.notify({ type: 'error', message: data.message })
+                    })
+                  })
               }
-              default:
-                // eslint-disable-next-line no-new
-                new Promise(() => {
-                  Toast.notify({ type: 'error', message: 'Server errors' })
-                })
             }
+            catch (e) {
+              Toast.notify({ type: 'error', message: `${e}` })
+            }
+
             return Promise.reject(resClone)
           }
 
           // handle delete api. Delete api not return content.
           if (res.status === 204) {
-            resolve({ result: "success" })
+            resolve({ result: 'success' })
             return
           }
 
@@ -160,8 +169,7 @@ const baseFetch = (url: string, fetchOptions: any, { needAllResponseContent }: I
   ])
 }
 
-export const ssePost = (url: string, fetchOptions: any, {
-  onData, onCompleted, onError }: IOtherOptions) => {
+export const ssePost = (url: string, fetchOptions: any, { onData, onCompleted, onError }: IOtherOptions) => {
   const options = Object.assign({}, baseOptions, {
     method: 'POST',
   }, fetchOptions)
