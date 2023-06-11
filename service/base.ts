@@ -54,6 +54,7 @@ const handleStream = (response: any, onData: IOnData, onCompleted?: IOnCompleted
   let isFirstMessage = true
   function read() {
     reader.read().then((result: any) => {
+      console.log(result)
       if (result.done) {
         onCompleted && onCompleted()
         return
