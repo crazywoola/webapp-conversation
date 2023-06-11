@@ -2,7 +2,6 @@ import { type NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { getClientFromApiSk, getInfo } from '@/app/api/utils/common'
-import { OpenAIStream } from '@/app/api/utils/stream'
 
 export async function POST(request: NextRequest) {
   const client = await getClientFromApiSk(request)
@@ -19,8 +18,7 @@ export async function POST(request: NextRequest) {
 
   if (client) {
     const res = await client.createChatMessage(inputs, query, user, responseMode, conversationId)
-    const stream = await OpenAIStream(res as any)
-    return new Response(stream as any)
+    return new Response(res.data as any)
   }
   return NextResponse.json({
     error: 'No client',

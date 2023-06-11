@@ -2,7 +2,7 @@ import { type NextRequest } from 'next/server'
 import * as jose from 'jose'
 import { APP_ID } from '@/config'
 const userPrefix = `user_${APP_ID}:`
-import { ChatClient } from 'langgenius-client'
+import { ChatClient } from 'dify-client'
 import { v4 } from 'uuid'
 
 
@@ -12,19 +12,17 @@ const secret = new TextEncoder().encode(
 
 export const getClientFromApiSk = async (request: NextRequest) => {
   const ak = request.cookies.get('access_token')?.value
-  console.log('document.cookie.ak', ak)
+  console.log('client document.cookie.ak', ak)
   try {
     if (ak !== undefined) {
-      console.log('document.cookie.ak if', ak)
       const { payload } = await jose.jwtVerify(ak, secret, {
         issuer: 'LangGenius:CE',
         subject: 'LangGenius:CE:Auth',
       }) as any
       const sk = payload.app_info.api_key
-      return new ChatClient(sk, 'https://api.dify.ai/v1')
+      return new ChatClient(sk)
     }
     else {
-      console.log('document.cookie.ak else', ak)
       return null
     }
   }
@@ -33,6 +31,7 @@ export const getClientFromApiSk = async (request: NextRequest) => {
     return null
   }
 }
+
 export const getInfo = (request: NextRequest) => {
   const sessionId = request.cookies.get('session_id')?.value || v4();
   const user = userPrefix + sessionId;
