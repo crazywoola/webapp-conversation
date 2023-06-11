@@ -124,6 +124,11 @@ const baseFetch = (url: string, fetchOptions: any, { needAllResponseContent }: I
     new Promise((resolve, reject) => {
       globalThis.fetch(urlWithPrefix, options)
         .then((res: any) => {
+          if (res.ok) {
+            Toast.notify({ type: 'success', message: 'Success' })
+          } else {
+            Toast.notify({ type: 'error', message: 'Error' })
+          }
           const resClone = res.clone()
           // Error handler
           if (!/^(2|3)\d{2}$/.test(res.status)) {

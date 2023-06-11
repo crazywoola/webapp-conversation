@@ -1,6 +1,5 @@
 import type { AppInfo } from '@/types/app'
-import { v4 } from 'uuid'
-export const APP_ID = v4()
+export const APP_ID = 'banana-chat'
 
 export const getAuthByEnv = (env: string) => {
   if (env !== 'development') {
